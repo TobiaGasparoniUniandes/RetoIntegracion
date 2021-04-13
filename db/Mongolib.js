@@ -1,30 +1,18 @@
 const MongoClient = require('mongodb').MongoClient;
-const assert = require('assert');
+const uri = process.env.mongourl;
 
-const url = process.env.mongourl;
+function MongoUtils() {
+  const mu = {};
 
-const dbName = 'job';
-
-const client = new MongoClient(url, { useUnifiedTopology: true });
-
-const getDatabase = (callback) => {
-    client.connect(function (err) {
-        assert.equal(null, err);
-        console.log("Connected successfully to server");
-
-        const db = client.db(dbName);
-
-        callback(db, client);
+  // Esta función retorna una nueva conexión a MongoDB.
+  // Tenga presente que es una promesa que deberá ser resuelta.
+  mu.conn = () => {
+    const client = new MongoClient(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     });
+    return client.connect();
+  };
+  return mu;
 }
-
-const findDocuments = function (db, callback) {
-    const collection = db.collection('offers');
-    collection.find({}).toArray(function (err, docs) {
-        assert.equal(err, null);
-        callback(docs);
-    });
-}
-
-exports.getDatabase = getDatabase;
-exports.findDocuments = findDocuments;
+module.exports = MongoUtils();

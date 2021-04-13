@@ -1,14 +1,18 @@
 var express = require('express');
 var router = express.Router();
-const Mongolib = require("../db/Mongolib");
+var [getOffers, insertOffer] = require('../controllers/offers.js');
 
-/* GET home page. */
-router.get('/', function (req, res, next) {
-    Mongolib.getDatabase(db => {
-        Mongolib.findDocuments(db, docs => {
-            res.send(docs);
-        })
-    })
+/* GET product listing. */
+router.get('/', async function (req, res, next) {
+  const offers = await getOffers();
+  res.send(offers);
+});
+/**
+ * POST product
+ */
+router.post('/', async function (req, res, next) {
+  const newOffer = await insertOffer(req.body);
+  res.send(newOffer);
 });
 
 module.exports = router;
